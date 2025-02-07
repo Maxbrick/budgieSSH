@@ -10,13 +10,129 @@
 !_TAG_FIELD_DESCRIPTION	typeref	/Type and name of a variable or typedef/
 !_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_KIND_DESCRIPTION!C	d,macro	/macro definitions/
+!_TAG_KIND_DESCRIPTION!C	e,enumerator	/enumerators (values inside an enumeration)/
+!_TAG_KIND_DESCRIPTION!C	f,function	/function definitions/
+!_TAG_KIND_DESCRIPTION!C	g,enum	/enumeration names/
+!_TAG_KIND_DESCRIPTION!C	h,header	/included header files/
+!_TAG_KIND_DESCRIPTION!C	m,member	/struct, and union members/
+!_TAG_KIND_DESCRIPTION!C	p,prototype	/function prototypes/
+!_TAG_KIND_DESCRIPTION!C	s,struct	/structure names/
+!_TAG_KIND_DESCRIPTION!C	t,typedef	/typedefs/
+!_TAG_KIND_DESCRIPTION!C	u,union	/union names/
+!_TAG_KIND_DESCRIPTION!C	v,variable	/variable definitions/
+!_TAG_KIND_DESCRIPTION!D	M,module	/modules/
+!_TAG_KIND_DESCRIPTION!D	T,template	/templates/
+!_TAG_KIND_DESCRIPTION!D	V,version	/version statements/
+!_TAG_KIND_DESCRIPTION!D	X,mixin	/mixins/
+!_TAG_KIND_DESCRIPTION!D	a,alias	/aliases/
+!_TAG_KIND_DESCRIPTION!D	c,class	/classes/
+!_TAG_KIND_DESCRIPTION!D	e,enumerator	/enumerators (values inside an enumeration)/
+!_TAG_KIND_DESCRIPTION!D	f,function	/function definitions/
+!_TAG_KIND_DESCRIPTION!D	g,enum	/enumeration names/
+!_TAG_KIND_DESCRIPTION!D	i,interface	/interfaces/
+!_TAG_KIND_DESCRIPTION!D	m,member	/class, struct, and union members/
+!_TAG_KIND_DESCRIPTION!D	n,namespace	/namespaces/
+!_TAG_KIND_DESCRIPTION!D	s,struct	/structure names/
+!_TAG_KIND_DESCRIPTION!D	u,union	/union names/
+!_TAG_KIND_DESCRIPTION!D	v,variable	/variable definitions/
+!_TAG_KIND_DESCRIPTION!Make	I,makefile	/makefiles/
+!_TAG_KIND_DESCRIPTION!Make	m,macro	/macros/
+!_TAG_KIND_DESCRIPTION!Make	t,target	/targets/
+!_TAG_KIND_DESCRIPTION!Markdown	S,subsection	/level 2 sections/
+!_TAG_KIND_DESCRIPTION!Markdown	T,l4subsection	/level 4 sections/
+!_TAG_KIND_DESCRIPTION!Markdown	c,chapter	/chapters/
+!_TAG_KIND_DESCRIPTION!Markdown	h,hashtag	/hashtags/
+!_TAG_KIND_DESCRIPTION!Markdown	n,footnote	/footnotes/
+!_TAG_KIND_DESCRIPTION!Markdown	s,section	/sections/
+!_TAG_KIND_DESCRIPTION!Markdown	t,subsubsection	/level 3 sections/
+!_TAG_KIND_DESCRIPTION!Markdown	u,l5subsection	/level 5 sections/
 !_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
 !_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
 !_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
 !_TAG_OUTPUT_VERSION	0.0	/current.age/
+!_TAG_PARSER_VERSION!C	1.1	/current.age/
+!_TAG_PARSER_VERSION!D	0.0	/current.age/
+!_TAG_PARSER_VERSION!Make	0.0	/current.age/
+!_TAG_PARSER_VERSION!Markdown	1.1	/current.age/
 !_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
 !_TAG_PROC_CWD	/home/maxbick/3dsProjects/3DSSH/	//
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	6.1.0	/v6.1.0/
+!_TAG_ROLE_DESCRIPTION!C!function	foreigndecl	/declared in foreign languages/
+!_TAG_ROLE_DESCRIPTION!C!header	local	/local header/
+!_TAG_ROLE_DESCRIPTION!C!header	system	/system header/
+!_TAG_ROLE_DESCRIPTION!C!macro	undef	/undefined/
+!_TAG_ROLE_DESCRIPTION!C!struct	foreigndecl	/declared in foreign languages/
+!_TAG_ROLE_DESCRIPTION!Make!makefile	included	/included/
+!_TAG_ROLE_DESCRIPTION!Make!makefile	optional	/optionally included/
+$(BUILD)	Makefile	/^$(BUILD):$/;"	t
+$(BUILD)/%.h	Makefile	/^$(GFXBUILD)\/%.t3x	$(BUILD)\/%.h	:	%.t3s$/;"	t
+$(DEPSDIR)	Makefile	/^$(DEPSDIR):$/;"	t
+$(GFXBUILD)	Makefile	/^$(GFXBUILD):$/;"	t
+$(GFXBUILD)/%.t3x	Makefile	/^$(GFXBUILD)\/%.t3x	$(BUILD)\/%.h	:	%.t3s$/;"	t
+$(OFILES_SOURCES)	Makefile	/^$(OFILES_SOURCES) : $(HFILES)$/;"	t
+$(OUTPUT).3dsx	Makefile	/^$(OUTPUT).3dsx	:	$(OUTPUT).elf $(_3DSXDEPS)$/;"	t
+$(OUTPUT).elf	Makefile	/^$(OUTPUT).elf	:	$(OFILES)$/;"	t
+%.bin.o	Makefile	/^%.bin.o	%_bin.h :	%.bin$/;"	t
+%.shbin.o	Makefile	/^%.shbin.o %_shbin.h : %.shbin$/;"	t
+%.t3x.o	Makefile	/^%.t3x.o	%_t3x.h :	%.t3x$/;"	t
+%_bin.h	Makefile	/^%.bin.o	%_bin.h :	%.bin$/;"	t
+%_shbin.h	Makefile	/^%.shbin.o %_shbin.h : %.shbin$/;"	t
+%_t3x.h	Makefile	/^%.t3x.o	%_t3x.h :	%.t3x$/;"	t
+APP_ICON	Makefile	/^			export APP_ICON := $(TOPDIR)\/icon.png$/;"	m
+APP_ICON	Makefile	/^		export APP_ICON := $(TOPDIR)\/$(TARGET).png$/;"	m
+APP_ICON	Makefile	/^	export APP_ICON := $(TOPDIR)\/$(ICON)$/;"	m
+ARCH	Makefile	/^ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft$/;"	m
+ASFLAGS	Makefile	/^ASFLAGS	:=	-g $(ARCH)$/;"	m
+BINFILES	Makefile	/^BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)\/*.*)))$/;"	m
+BUILD	Makefile	/^BUILD		:=	build$/;"	m
+CFILES	Makefile	/^CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)\/*.c)))$/;"	m
+CFLAGS	Makefile	/^CFLAGS	:=	-g -Wall -O2 -mword-relocations \\$/;"	m
+CPPFILES	Makefile	/^CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)\/*.cpp)))$/;"	m
+CXXFLAGS	Makefile	/^CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11$/;"	m
+DATA	Makefile	/^DATA		:=	data$/;"	m
+DEPSDIR	Makefile	/^export DEPSDIR	:=	$(CURDIR)\/$(BUILD)$/;"	m
+GFXBUILD	Makefile	/^GFXBUILD	:=	$(BUILD)$/;"	m
+GFXFILES	Makefile	/^GFXFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)\/*.t3s)))$/;"	m
+GRAPHICS	Makefile	/^GRAPHICS	:=	gfx$/;"	m
+HFILES	Makefile	/^export HFILES	:=	$(PICAFILES:.v.pica=_shbin.h) $(SHLISTFILES:.shlist=_shbin.h) \\$/;"	m
+INCLUDE	Makefile	/^export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)\/$(dir)) \\$/;"	m
+INCLUDES	Makefile	/^INCLUDES	:=	include$/;"	m
+LD	Makefile	/^	export LD	:=	$(CC)$/;"	m
+LD	Makefile	/^	export LD	:=	$(CXX)$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)$/;"	m
+LIBDIRS	Makefile	/^LIBDIRS	:= $(CTRULIB) $(PORTLIBS)$/;"	m
+LIBPATHS	Makefile	/^export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)\/lib)$/;"	m
+LIBS	Makefile	/^LIBS	:= -lssh2 -lmbedtls -lmbedx509 -lmbedcrypto -lz -lm -lctru$/;"	m
+OFILES	Makefile	/^export OFILES := $(OFILES_BIN) $(OFILES_SOURCES)$/;"	m
+OFILES_BIN	Makefile	/^export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES)) \\$/;"	m
+OFILES_SOURCES	Makefile	/^export OFILES_SOURCES 	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)$/;"	m
+OUTPUT	Makefile	/^export OUTPUT	:=	$(CURDIR)\/$(TARGET)$/;"	m
+PICAFILES	Makefile	/^PICAFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)\/*.v.pica)))$/;"	m
+ROMFS_T3XFILES	Makefile	/^export ROMFS_T3XFILES	:=	$(patsubst %.t3s, $(GFXBUILD)\/%.t3x, $(GFXFILES))$/;"	m
+SFILES	Makefile	/^SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)\/*.s)))$/;"	m
+SHLISTFILES	Makefile	/^SHLISTFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)\/*.shlist)))$/;"	m
+SOC_ALIGN	source/main.c	/^#define SOC_ALIGN /;"	d	file:
+SOC_BUFFERSIZE	source/main.c	/^#define SOC_BUFFERSIZE /;"	d	file:
+SOC_buffer	source/main.c	/^static u32 *SOC_buffer = NULL;$/;"	v	typeref:typename:u32 *	file:
+SOURCES	Makefile	/^SOURCES		:=	source$/;"	m
+T3XFILES	Makefile	/^export T3XFILES :=  $(GFXFILES:.t3s=.t3x)$/;"	m
+T3XHFILES	Makefile	/^export T3XHFILES		:=	$(patsubst %.t3s, $(BUILD)\/%.h, $(GFXFILES))$/;"	m
+TARGET	Makefile	/^TARGET		:=	$(notdir $(CURDIR))$/;"	m
+TOPDIR	Makefile	/^TOPDIR ?= $(CURDIR)$/;"	m
+TOPDIR	Makefile	/^export TOPDIR	:=	$(CURDIR)$/;"	m
+VPATH	Makefile	/^export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)\/$(dir)) \\$/;"	m
+_3DSXDEPS	Makefile	/^export _3DSXDEPS	:=	$(if $(NO_SMDH),,$(OUTPUT).smdh)$/;"	m
+all	Makefile	/^all: $(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(T3XHFILES)$/;"	t
+clean	Makefile	/^clean:$/;"	t
+csock	source/main.c	/^s32 sock = -1, csock = -1;$/;"	v	typeref:typename:s32
+icons	Makefile	/^	icons := $(wildcard *.png)$/;"	m
+main	source/main.c	/^int main() {$/;"	f	typeref:typename:int
+privkey	source/main.c	/^static const char *privkey = "ssh\/";$/;"	v	typeref:typename:const char *	file:
+pubkey	source/main.c	/^static const char *pubkey = "ssh\/";$/;"	v	typeref:typename:const char *	file:
+socShutdown	source/main.c	/^void socShutdown() {$/;"	f	typeref:typename:void
+sock	source/main.c	/^s32 sock = -1, csock = -1;$/;"	v	typeref:typename:s32
+template	README.md	/^# template$/;"	c

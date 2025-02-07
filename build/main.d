@@ -84,8 +84,8 @@ main.o: /home/maxbick/3dsProjects/3DSSH/source/main.c \
  /opt/devkitpro/libctru/include/3ds/font.h \
  /opt/devkitpro/libctru/include/3ds/gdbhio_dev.h \
  /opt/devkitpro/libctru/include/3ds/3dslink.h \
- /opt/devkitpro/libctru/include/libssh2.h \
- /opt/devkitpro/libctru/include/arpa/inet.h
+ /opt/devkitpro/libctru/include/arpa/inet.h \
+ /opt/devkitpro/portlibs/3ds/include/libssh2.h
 /opt/devkitpro/libctru/include/3ds.h:
 /opt/devkitpro/libctru/include/3ds/types.h:
 /opt/devkitpro/libctru/include/3ds/result.h:
@@ -171,5 +171,5 @@ main.o: /home/maxbick/3dsProjects/3DSSH/source/main.c \
 /opt/devkitpro/libctru/include/3ds/font.h:
 /opt/devkitpro/libctru/include/3ds/gdbhio_dev.h:
 /opt/devkitpro/libctru/include/3ds/3dslink.h:
-/opt/devkitpro/libctru/include/libssh2.h:
 /opt/devkitpro/libctru/include/arpa/inet.h:
+/opt/devkitpro/portlibs/3ds/include/libssh2.h:
