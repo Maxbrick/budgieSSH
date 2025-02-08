@@ -1,4 +1,4 @@
-main.o: /home/maxbick/3dsProjects/3DSSH/source/main.c \
+main.o: /home/maxbick/3dsProjects/budgieSSH/source/main.c \
  /opt/devkitpro/libctru/include/3ds.h \
  /opt/devkitpro/libctru/include/3ds/types.h \
  /opt/devkitpro/libctru/include/3ds/result.h \
