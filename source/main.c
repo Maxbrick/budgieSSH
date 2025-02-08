@@ -43,6 +43,7 @@ int main() {
 
 	gfxInitDefault();
 	consoleInit(GFX_TOP, NULL);
+	consoleDebugInit(debugDevice_3DMOO);
 
 	printf("Welcome to 3DSSH!\n");
 	// allocate buffer for SOC service
@@ -86,7 +87,6 @@ int main() {
 
     	if (sock < 0) {
 		printf("couldn't make socket :(\n");
-		goto shutdown;
     	}
 
 	sa.sin_family = AF_INET;
@@ -109,6 +109,7 @@ int main() {
 
 	rc = libssh2_session_handshake(session, sock);
 	
+	libssh2_trace(session, 1);
 	if(rc) {
 		printf("faiiil: %d\n", rc);
 	} else printf("Handshook\n");
@@ -128,39 +129,60 @@ int main() {
         	printf("Unable to open a session\n");
     	}
 	printf("Requesting pty..\n");
-	if(libssh2_channel_request_pty(channel, "vanilla")) {
+	if(libssh2_channel_request_pty(channel, "ansi")) {
         	printf("Failed requesting pty\n");
     	}
-	printf("requesting shell..\n")
+	printf("requesting shell..\n");
 	if(libssh2_channel_shell(channel)) {
         	printf("Unable to request shell on allocated pty\n");
         }
+	libssh2_channel_set_blocking(channel, 0);
 
+	libssh2_channel_write(channel, "\x1b[?2004l", 7);
 	// Main loop
 	while (aptMainLoop())
 	{
-		printf("we loopin\'\n");
-	
 		gspWaitForVBlank();
 		gfxSwapBuffers();
 		char buf[1024];
-		char enterbuf[2] = "\n";
-		libssh2_channel_read(channel, buf, sizeof(buf));
-		printf(buf);
+		ssize_t err = libssh2_channel_read(channel, buf, sizeof(buf));
+
+		if(err < 0)
+             		fprintf(stderr, "Unable to read response: %ld\n", (long)err);
+            	else {
+                	fwrite(buf, 1, (size_t)err, stdout);
+            	}
+		char enterbuf[4] = "\x0A";
 		hidScanInput();
 		u32 kDown = hidKeysDown();
-		if (kDown & KEY_A) {
-			printf("a\n");
+		
+		// loop through all possible button bits, check if
+		// they are true, if so execute its function
+		u32 i;
+
+		for(i = 0; (i < 32); i++) {
+		if(!(kDown & BIT(i))) continue;
+		switch(BIT(i)) {
+		case (KEY_A):
 			char textbuf[120];
 			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
 			swkbdSetHintText(&swkbd, "Enter ASCII text");
 			swkbdInputText(&swkbd, textbuf, sizeof(textbuf));
 			libssh2_channel_write(channel, textbuf, sizeof(textbuf));
-		} else if (kDown & KEY_Y)
-			libssh2_channel_write(channel, enterbuf, sizeof(enterbuf));
-	}
+			continue;
 
-shutdown:
+		case (KEY_Y):
+			libssh2_channel_write(channel, enterbuf, sizeof(enterbuf));
+			continue;
+		case (KEY_X):
+			continue;
+		default:
+			continue;
+		}
+		}
+	}
+//
+
 	if(session) {
 		libssh2_session_disconnect(session, "Normal Shutdown");
 		libssh2_session_free(session);
