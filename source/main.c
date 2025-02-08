@@ -138,7 +138,7 @@ int main() {
         }
 	libssh2_channel_set_blocking(channel, 0);
 
-	libssh2_channel_write(channel, "\x1b[?2004l", 7);
+	libssh2_channel_write(channel, "\x1b[?25h", 6);
 	// Main loop
 	while (aptMainLoop())
 	{
@@ -152,7 +152,12 @@ int main() {
             	else {
                 	fwrite(buf, 1, (size_t)err, stdout);
             	}
-		char enterbuf[4] = "\x0A";
+		#define ENTER_BUF "\x0A"
+		#define UP_BUF "\x1b[1A"
+		#define DOWN_BUF "\x1b[1B"
+		#define RIGHT_BUF "\x1b[1C"
+		#define LEFT_BUF "\x1b[1D"
+	
 		hidScanInput();
 		u32 kDown = hidKeysDown();
 		
@@ -163,20 +168,29 @@ int main() {
 		for(i = 0; (i < 32); i++) {
 		if(!(kDown & BIT(i))) continue;
 		switch(BIT(i)) {
-		case (KEY_A):
+		case KEY_A:
 			char textbuf[120];
 			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
 			swkbdSetHintText(&swkbd, "Enter ASCII text");
 			swkbdInputText(&swkbd, textbuf, sizeof(textbuf));
 			libssh2_channel_write(channel, textbuf, sizeof(textbuf));
+			textbuf = "";
+		case KEY_B:
+			libssh2_channel_write(channel, "\b", 1);
+		case KEY_Y:
+			libssh2_channel_write(channel, ENTER_BUF, 1);
+		case KEY_X:
 			continue;
-
-		case (KEY_Y):
-			libssh2_channel_write(channel, enterbuf, sizeof(enterbuf));
-			continue;
-		case (KEY_X):
-			continue;
+		case KEY_UP:
+			libssh2_channel_write(channel, UP_BUF, 4);
+		case KEY_DOWN:
+			libssh2_channel_write(channel, DOWN_BUF, 4);
+		case KEY_RIGHT:
+			libssfh2_channel_write(channel, RIGHT_BUF, 4);
+		case KEY_LEFT:
+			libssh2_channel_write(channel, LEFT_BUF, 4);
 		default:
+			//this should never happen
 			continue;
 		}
 		}
