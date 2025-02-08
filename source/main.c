@@ -169,12 +169,11 @@ int main() {
 		if(!(kDown & BIT(i))) continue;
 		switch(BIT(i)) {
 		case KEY_A:
-			char textbuf[120];
+			char textbuf[120] = "";
 			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
 			swkbdSetHintText(&swkbd, "Enter ASCII text");
 			swkbdInputText(&swkbd, textbuf, sizeof(textbuf));
 			libssh2_channel_write(channel, textbuf, sizeof(textbuf));
-			textbuf = "";
 		case KEY_B:
 			libssh2_channel_write(channel, "\b", 1);
 		case KEY_Y:
