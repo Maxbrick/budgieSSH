@@ -186,7 +186,7 @@ int main() {
 		case KEY_DOWN:
 			libssh2_channel_write(channel, DOWN_BUF, 4);
 		case KEY_RIGHT:
-			libssfh2_channel_write(channel, RIGHT_BUF, 4);
+			libssh2_channel_write(channel, RIGHT_BUF, 4);
 		case KEY_LEFT:
 			libssh2_channel_write(channel, LEFT_BUF, 4);
 		default:
