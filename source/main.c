@@ -130,7 +130,7 @@ int main() {
         	printf("Unable to open a session\n");
     	}
 	printf("Requesting pty..\n");
-	if(libssh2_channel_request_pty(channel, "ansi")) {
+	if(libssh2_channel_request_pty(channel, "vt100")) {
         	printf("Failed requesting pty\n");
     	}
 	printf("requesting shell..\n");
@@ -139,7 +139,9 @@ int main() {
         }
 	libssh2_channel_set_blocking(channel, 0);
 
-	libssh2_channel_write(channel, "\x1b[?25h", 6);
+	//stop 2004h from appearing
+	libssh2_channel_write(channel, "bind 'set enable-bracketed-paste off'\x0A", 39);
+
 	// Main loop
 	while (aptMainLoop())
 	{
@@ -150,10 +152,12 @@ int main() {
 
 		//probably silly to store these as char arraysv
 		char enterbuf[2] = "\x0A";
-		char upbuf[4] = "\x1b[1A";
-		char downbuf[4] = "\x1b[1B";
-		char rightbuf[4] = "\x1b[1C";
-		char leftbuf[4] = "\x1b[1D";
+		char upbuf[5] = "\x1b[1A";
+		char downbuf[5] = "\x1b[1B";
+		char rightbuf[5] = "\x1b[1C";
+		char leftbuf[5] = "\x1b[1D";
+		char scrupbuf[5] = "\x1b[1S";
+		char scrdownbuf[5] = "\x1b[1T";
 		ssize_t err = libssh2_channel_read(channel, buf, sizeof(buf));
 
 		if(err < 0)
@@ -183,27 +187,34 @@ int main() {
 			libssh2_channel_write(channel, "\b", 1);
 			break;
 		case KEY_Y:
-			libssh2_channel_write(channel, enterbuf, sizeof(enterbuf));
+			libssh2_channel_write(channel, enterbuf, (sizeof(enterbuf) - 1));
 			break;
 		case KEY_X:
-			continue;
+			libssh2_channel_write(channel, "\t", 1);
 		case KEY_UP:
-			libssh2_channel_write(channel, upbuf, sizeof(upbuf));
+			libssh2_channel_write(channel, upbuf, strlen(upbuf));
 			break;
 		case KEY_DOWN:
-			libssh2_channel_write(channel, downbuf, sizeof(downbuf));
+			libssh2_channel_write(channel, downbuf, strlen(downbuf));
 			break;
 		case KEY_RIGHT:
-			libssh2_channel_write(channel, rightbuf, sizeof(rightbuf));
+			libssh2_channel_write(channel, rightbuf, strlen(rightbuf));
 			break;
 		case KEY_LEFT:
-			libssh2_channel_write(channel, leftbuf, sizeof(leftbuf));
+			libssh2_channel_write(channel, leftbuf, strlen(leftbuf));
+			break;
+		case KEY_L:
+			libssh2_channel_write(channel, scrupbuf, strlen(scrupbuf));
+			break;
+		case KEY_R:
+			libssh2_channel_write(channel, scrdownbuf, strlen(scrdownbuf));
 			break;
 		default:
-			//this should never happen
 			continue;
 		}
 		}
+		if(kDown & KEY_START)
+			break;
 	}
 //
 
