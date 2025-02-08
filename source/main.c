@@ -39,6 +39,7 @@ int main() {
 	LIBSSH2_CHANNEL *channel;
 	char host_addr[16];
 
+
 	struct sockaddr_in sa;
 
 	gfxInitDefault();
@@ -145,6 +146,14 @@ int main() {
 		gspWaitForVBlank();
 		gfxSwapBuffers();
 		char buf[1024];
+		char textbuf[128];
+
+		//probably silly to store these as char arraysv
+		char enterbuf[2] = "\x0A";
+		char upbuf[4] = "\x1b[1A";
+		char downbuf[4] = "\x1b[1B";
+		char rightbuf[4] = "\x1b[1C";
+		char leftbuf[4] = "\x1b[1D";
 		ssize_t err = libssh2_channel_read(channel, buf, sizeof(buf));
 
 		if(err < 0)
@@ -152,11 +161,6 @@ int main() {
             	else {
                 	fwrite(buf, 1, (size_t)err, stdout);
             	}
-		#define ENTER_BUF "\x0A"
-		#define UP_BUF "\x1b[1A"
-		#define DOWN_BUF "\x1b[1B"
-		#define RIGHT_BUF "\x1b[1C"
-		#define LEFT_BUF "\x1b[1D"
 	
 		hidScanInput();
 		u32 kDown = hidKeysDown();
@@ -164,30 +168,37 @@ int main() {
 		// loop through all possible button bits, check if
 		// they are true, if so execute its function
 		u32 i;
-
+		SwkbdState swkbdl;
 		for(i = 0; (i < 32); i++) {
 		if(!(kDown & BIT(i))) continue;
 		switch(BIT(i)) {
 		case KEY_A:
-			char textbuf[120] = "";
-			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
-			swkbdSetHintText(&swkbd, "Enter ASCII text");
-			swkbdInputText(&swkbd, textbuf, sizeof(textbuf));
+			swkbdInit(&swkbdl, SWKBD_TYPE_NORMAL, 1, -1);
+			swkbdSetHintText(&swkbdl, "Enter ASCII text");
+			swkbdInputText(&swkbdl, textbuf, sizeof(textbuf));
 			libssh2_channel_write(channel, textbuf, sizeof(textbuf));
+			memset(textbuf, '\0', sizeof(textbuf));
+			break;
 		case KEY_B:
 			libssh2_channel_write(channel, "\b", 1);
+			break;
 		case KEY_Y:
-			libssh2_channel_write(channel, ENTER_BUF, 1);
+			libssh2_channel_write(channel, enterbuf, sizeof(enterbuf));
+			break;
 		case KEY_X:
 			continue;
 		case KEY_UP:
-			libssh2_channel_write(channel, UP_BUF, 4);
+			libssh2_channel_write(channel, upbuf, sizeof(upbuf));
+			break;
 		case KEY_DOWN:
-			libssh2_channel_write(channel, DOWN_BUF, 4);
+			libssh2_channel_write(channel, downbuf, sizeof(downbuf));
+			break;
 		case KEY_RIGHT:
-			libssh2_channel_write(channel, RIGHT_BUF, 4);
+			libssh2_channel_write(channel, rightbuf, sizeof(rightbuf));
+			break;
 		case KEY_LEFT:
-			libssh2_channel_write(channel, LEFT_BUF, 4);
+			libssh2_channel_write(channel, leftbuf, sizeof(leftbuf));
+			break;
 		default:
 			//this should never happen
 			continue;
