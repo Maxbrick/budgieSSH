@@ -153,11 +153,11 @@ int main() {
 		//probably silly to store these as char arraysv
 		char enterbuf[2] = "\x0A";
 		char upbuf[5] = "\x1b[1A";
-		char downbuf[5] = "\x1b[1B";
-		char rightbuf[5] = "\x1b[1C";
-		char leftbuf[5] = "\x1b[1D";
-		char scrupbuf[5] = "\x1b[1S";
-		char scrdownbuf[5] = "\x1b[1T";
+		char downbuf[4] = "\x1b[1B";
+		char rightbuf[4] = "\x1b[C";
+		char leftbuf[4] = "\x1b[D";
+		char scrupbuf[4] = "\x1b[S";
+		char scrdownbuf[4] = "\x1b[T";
 		ssize_t err = libssh2_channel_read(channel, buf, sizeof(buf));
 
 		if(err < 0)
