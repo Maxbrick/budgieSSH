@@ -236,12 +236,13 @@ int main() {
 		ssize_t err = libssh2_channel_read(channel, buf, sizeof(buf));
 
              	//	fprintf(stderr, "Unable to read response: %ld\n", (long)err);
-		if(err < 0)
-			printf("");
-            	else {
-                	fwrite(buf, 1, (size_t)err, stdout);
-            	}
-	
+		if(err < 0) {
+			//bullcrap filler statement bc
+			//idk what im doing
+			memset(textbuf, '\0', sizeof(textbuf));
+		} else {
+			fwrite(buf, 1, (size_t)err, stdout);
+		}
 		hidScanInput();
 		u32 kDown = hidKeysDown();
 		
