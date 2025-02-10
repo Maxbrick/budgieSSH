@@ -40,6 +40,7 @@ int main() {
 	char password[60];
 	char pubkey[60];
 	char privkey[60];
+	char *userauthlist;
 	LIBSSH2_SESSION *session = NULL;
 	LIBSSH2_CHANNEL *channel;
 	char host_addr[120];
@@ -51,7 +52,11 @@ int main() {
 	consoleInit(GFX_TOP, NULL);
 	//consoleDebugInit();
 
-	printf("Welcome to 3DSSH!\n");
+	printf("Welcome to \x1b[0;32mbudgieSSH!\x1b[0;37m\n");
+	printf("\nA to input text, b for backsppace, x for tab,\ny to enter\n");
+	printf("\nWARNING: Extremely early alpha version!!!\nBugs will happen! Also, pubkey authentication\nprobably won\'t work.\n");
+	printf("\nPlease only use for local networks with password \nauthentication.\n \n");
+
 	// allocate buffer for SOC service
 	SOC_buffer = (u32*)memalign(SOC_ALIGN, SOC_BUFFERSIZE);
 
@@ -74,6 +79,7 @@ int main() {
     	}
 
 	// Prompt user for target user and host address
+	// I'm not super smart with how to use keyboards
 	swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
 	swkbdSetHintText(&swkbd, "Username");
 	swkbdInputText(&swkbd, username, sizeof(username));
@@ -98,7 +104,7 @@ int main() {
     	}
 
 	sa.sin_family = AF_INET;
-	sa.sin_port = htons(22);
+	sa.sin_port = htons(atoi(ssh_port));
 	sa.sin_addr.s_addr = host_addr_int;
 
 	printf("Connecting to %s:%d as user %s\n",
@@ -124,6 +130,25 @@ int main() {
 
 
 	//Authentication stuff (if it wasn't obvious by now a lot of this is just copied from libssh2's examples)
+	/* check what authentication methods are available */ 
+    userauthlist = libssh2_userauth_list(session, username, (unsigned int)strlen(username));
+    if(userauthlist) {
+        printf("Authentication methods: %s\n", userauthlist);
+        if(strstr(userauthlist, "password")) {
+            auth_pw = 1;
+        } else
+        if(strstr(userauthlist, "keyboard-interactive")) {
+            auth_pw = 2;
+        } else
+        if(strstr(userauthlist, "publickey")) {
+            auth_pw = 4;
+        } 
+		char stupid_buffer_im_lazy[2];
+		swkbdInit(&swkbd, SWKBD_TYPE_NUMPAD, 1, -1);
+		swkbdSetHintText(&swkbd, "1 = password, 2 = keyboard interactive, 4 = publickey");
+		swkbdInputText(&swkbd, stupid_buffer_im_lazy, sizeof(stupid_buffer_im_lazy));
+		auth_pw = atoi(stupid_buffer_im_lazy);
+        }
 	if(auth_pw & 1) {
             /* We could authenticate via password */ 
 			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
@@ -210,8 +235,9 @@ int main() {
 		char scrdownbuf[4] = "\x1b[T";
 		ssize_t err = libssh2_channel_read(channel, buf, sizeof(buf));
 
+             	//	fprintf(stderr, "Unable to read response: %ld\n", (long)err);
 		if(err < 0)
-             		fprintf(stderr, "Unable to read response: %ld\n", (long)err);
+			printf("");
             	else {
                 	fwrite(buf, 1, (size_t)err, stdout);
             	}
