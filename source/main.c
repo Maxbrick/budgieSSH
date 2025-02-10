@@ -18,8 +18,6 @@
 static u32 *SOC_buffer = NULL;
 s32 sock = -1, csock = -1;
 
-static const char *pubkey = "ssh/";
-static const char *privkey = "ssh/";
 //---------------------------------------------------------------------------------
 void socShutdown() {
 //---------------------------------------------------------------------------------
@@ -31,20 +29,27 @@ void socShutdown() {
 int main() {
 	SwkbdState swkbd;
 	uint32_t host_addr_int;
+
+	//should probably change this to not a char array
+	char ssh_port[8];
+
+	int auth_pw = 0;
 	int rc;
 	int sock;
 	char username[60];
 	char password[60];
+	char pubkey[60];
+	char privkey[60];
 	LIBSSH2_SESSION *session = NULL;
 	LIBSSH2_CHANNEL *channel;
-	char host_addr[16];
+	char host_addr[120];
 
 
 	struct sockaddr_in sa;
 
 	gfxInitDefault();
 	consoleInit(GFX_TOP, NULL);
-	consoleDebugInit(debugDevice_3DMOO);
+	//consoleDebugInit();
 
 	printf("Welcome to 3DSSH!\n");
 	// allocate buffer for SOC service
@@ -73,11 +78,13 @@ int main() {
 	swkbdSetHintText(&swkbd, "Username");
 	swkbdInputText(&swkbd, username, sizeof(username));
 	
-        swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
-        swkbdSetHintText(&swkbd, "Host Address");
-        swkbdInputText(&swkbd, host_addr, sizeof(host_addr));
+	swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
+	swkbdSetHintText(&swkbd, "Host Address");
+	swkbdInputText(&swkbd, host_addr, sizeof(host_addr));
 		
-	printf("(Assuming port is 22)\n");
+	swkbdInit(&swkbd, SWKBD_TYPE_NUMPAD, 1, -1);
+	swkbdSetHintText(&swkbd, "Port Number (usually 22)");
+	swkbdInputText(&swkbd, ssh_port, sizeof(ssh_port));
 
 	printf("Username: %s\n", username);
 	printf("Host Address: %s\n", host_addr);
@@ -115,20 +122,63 @@ int main() {
 		printf("faiiil: %d\n", rc);
 	} else printf("Handshook\n");
 
-	swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
-        swkbdSetHintText(&swkbd, "Password");
-        swkbdInputText(&swkbd, password, sizeof(password));
 
+	//Authentication stuff (if it wasn't obvious by now a lot of this is just copied from libssh2's examples)
+	if(auth_pw & 1) {
+            /* We could authenticate via password */ 
+			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
+			swkbdSetHintText(&swkbd, "Password");
+			swkbdInputText(&swkbd, password, sizeof(password));
+		
+            if(libssh2_userauth_password(session, username, password)) {
 
-	if(libssh2_userauth_password(session, username, password)) {
-		printf("Authenticate by password failed!\n");
-	} 
- 
+                printf("Authentication by password failed.\n");
+                goto shutdown;
+            }
+            else {
+                printf("Authentication by password succeeded.\n");
+            }
+        }/* implement this later probably her her her
+        else if(auth_pw & 2) {
+            if(libssh2_userauth_keyboard_interactive(session, username,
+
+                                                     &kbd_callback) ) {
+                printf(
+                        "Authentication by keyboard-interactive failed.\n");
+                goto shutdown;
+            }
+            else {
+                printf(
+                        "Authentication by keyboard-interactive succeeded.\n");
+            }
+        }*/
+        else if(auth_pw & 4) {
+            /* Or by public key */ 
+            size_t fn1sz, fn2sz;
+            char *fn1, *fn2;
+            char const *h = "sdmc:/3ds/.ssh/";
+			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
+			swkbdSetHintText(&swkbd, "Enter name of key file in sdmc:/3ds/.ssh/");
+			swkbdInputText(&swkbd, password, sizeof(password));
+            if(!h || !*h)
+                h = ".";
+            fn1sz = strlen(h) + strlen(pubkey) + 2;
+            fn2sz = strlen(h) + strlen(privkey) + 2;
+            fn1 = malloc(fn1sz);
+            fn2 = malloc(fn2sz);
+            if(!fn1 || !fn2) {
+                free(fn2);
+                free(fn1);
+                printf("out of memory\n");
+                goto shutdown;
+            }
+ 	}
 	channel = libssh2_channel_open_session(session);
 	printf("Openning libssh2 session...\n");
     	if(!channel) {
         	printf("Unable to open a session\n");
     	}
+
 	printf("Requesting pty..\n");
 	if(libssh2_channel_request_pty(channel, "vt100")) {
         	printf("Failed requesting pty\n");
@@ -216,7 +266,7 @@ int main() {
 		if(kDown & KEY_START)
 			break;
 	}
-//
+shutdown:
 
 	if(session) {
 		libssh2_session_disconnect(session, "Normal Shutdown");
