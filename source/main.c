@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <libssh2.h>
+#include <jimmy.h>
 #define SOC_ALIGN       0x1000
 #define SOC_BUFFERSIZE  0x100000
 
@@ -53,6 +54,7 @@ int main() {
 	//consoleDebugInit();
 
 	printf("Welcome to \x1b[0;32mbudgieSSH!\x1b[0;37m\n");
+	printf(jimmy);
 	printf("\nA to input text, b for backsppace, x for tab,\ny to enter\n");
 	printf("\nWARNING: Extremely early alpha version!!!\nBugs will happen! Also, pubkey authentication\nprobably won\'t work.\n");
 	printf("\nPlease only use for local networks with password \nauthentication.\n \n");

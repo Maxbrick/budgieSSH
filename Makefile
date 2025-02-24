@@ -63,7 +63,7 @@ LIBS	:= -lssh2 -lmbedtls -lmbedx509 -lmbedcrypto -lz -lm -lctru
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(CTRULIB) $(PORTLIBS)
+LIBDIRS	:= $(CURDIR) $(CTRULIB) $(PORTLIBS)
 
 
 #---------------------------------------------------------------------------------
