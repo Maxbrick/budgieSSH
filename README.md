@@ -1,3 +1,6 @@
-# template
+#budgieSSH
 
-This is a template for starting new 3DS libctru projects.
+It's an SSH client for the 3DS that actually works
+Sorry S3SH but you don't work no more :(
+
+also it has a cute bird named Jimmy
