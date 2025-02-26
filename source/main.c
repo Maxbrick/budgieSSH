@@ -39,8 +39,9 @@ int main() {
 	int sock;
 	char username[60];
 	char password[60];
-	char pubkey[60];
-	char privkey[60];
+	char passphrase[256];
+	char pubkey[1024];
+	char privkey[128];
 	char *userauthlist;
 	LIBSSH2_SESSION *session = NULL;
 	LIBSSH2_CHANNEL *channel;
@@ -51,10 +52,13 @@ int main() {
 
 	gfxInitDefault();
 	consoleInit(GFX_TOP, NULL);
-	//consoleDebugInit();
+	consoleDebugInit(debugDevice_CONSOLE);
 
 	printf("Welcome to \x1b[0;32mbudgieSSH!\x1b[0;37m\n");
+
+    //jimmy
 	printf(jimmy);
+
 	printf("\nA to input text, b for backsppace, x for tab,\ny to enter\n");
 	printf("\nWARNING: Extremely early alpha version!!!\nBugs will happen! Also, pubkey authentication\nprobably won\'t work.\n");
 	printf("\nPlease only use for local networks with password \nauthentication.\n \n");
@@ -181,12 +185,20 @@ int main() {
         }*/
         else if(auth_pw & 4) {
             /* Or by public key */ 
-            size_t fn1sz, fn2sz;
-            char *fn1, *fn2;
-            char const *h = "sdmc:/3ds/.ssh/";
+			
 			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
-			swkbdSetHintText(&swkbd, "Enter name of key file in sdmc:/3ds/.ssh/");
-			swkbdInputText(&swkbd, password, sizeof(password));
+			swkbdSetHintText(&swkbd, "Enter name of the privkey file in sdmc:/3ds/ssh/");
+			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
+			swkbdInputText(&swkbd, privkey, sizeof(privkey));
+			swkbdSetHintText(&swkbd, "Enter name of the pubkey file in sdmc:/3ds/ssh");
+			swkbdInputText(&swkbd, pubkey, sizeof(pubkey));
+
+			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
+			swkbdSetHintText(&swkbd, "Enter Passphrase");
+			swkbdInputText(&swkbd, passphrase, sizeof(passphrase));
+			size_t fn1sz, fn2sz;
+            char *fn1, *fn2;
+            char const *h = "./ssh";
             if(!h || !*h)
                 h = ".";
             fn1sz = strlen(h) + strlen(pubkey) + 2;
@@ -196,9 +208,29 @@ int main() {
             if(!fn1 || !fn2) {
                 free(fn2);
                 free(fn1);
-                printf("out of memory\n");
+                fprintf(stderr, "out of memory\n");
                 goto shutdown;
             }
+			snprintf(fn1, fn1sz, "%s/%s", h, pubkey);
+            snprintf(fn2, fn2sz, "%s/%s", h, privkey);
+
+			FILE *file = fopen(fn2, "r");
+			char ch;
+		    while ((ch = fgetc(file)) == EOF && rc != 900) {
+			    putchar(ch);
+				rc++;
+		    }
+			fclose(file);
+			printf(pubkey);
+			printf(privkey);
+			printf("\n%s,%s\n", fn1, fn2);
+			printf(passphrase);
+			rc = libssh2_userauth_publickey_fromfile(session, username, fn1, fn2, passphrase);
+			if(rc) {
+				printf("Authentication by pubkey failed: %d", rc);
+			} else {
+				printf("Authentication by pubkey succeeded");
+			}
  	}
 	channel = libssh2_channel_open_session(session);
 	printf("Openning libssh2 session...\n");
