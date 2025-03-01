@@ -188,16 +188,18 @@ int main() {
 			
 			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
 			swkbdSetHintText(&swkbd, "Enter name of the privkey file in sdmc:/3ds/ssh/");
-			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
 			swkbdInputText(&swkbd, privkey, sizeof(privkey));
-			swkbdSetHintText(&swkbd, "Enter name of the pubkey file in sdmc:/3ds/ssh");
-			swkbdInputText(&swkbd, pubkey, sizeof(pubkey));
+
+			printf("\n(Assuming that the pub key is %s.pub\n", privkey);
+
+			snprintf(pubkey, (sizeof(privkey) + 4), "%s%s", privkey, ".pub");
 
 			swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
 			swkbdSetHintText(&swkbd, "Enter Passphrase");
 			swkbdInputText(&swkbd, passphrase, sizeof(passphrase));
 			size_t fn1sz, fn2sz;
             char *fn1, *fn2;
+
             char const *h = "./ssh";
             if(!h || !*h)
                 h = ".";
@@ -213,23 +215,49 @@ int main() {
             }
 			snprintf(fn1, fn1sz, "%s/%s", h, pubkey);
             snprintf(fn2, fn2sz, "%s/%s", h, privkey);
-
-			FILE *file = fopen(fn2, "r");
-			char ch;
-		    while ((ch = fgetc(file)) == EOF && rc != 900) {
-			    putchar(ch);
-				rc++;
-		    }
-			fclose(file);
+			
 			printf(pubkey);
 			printf(privkey);
 			printf("\n%s,%s\n", fn1, fn2);
-			printf(passphrase);
-			rc = libssh2_userauth_publickey_fromfile(session, username, fn1, fn2, passphrase);
+
+			//open pubkey and privkey and store them into a buffer, since I can't get the fromfile function that
+			//lssh2 provides to work...
+			printf("loading key files into memory...");
+			char pubkey_buffer[256];
+			char privkey_buffer[2048];
+			FILE *pubkey_file = fopen(fn1, "r");
+			FILE *privkey_file = fopen(fn2, "r");
+			if (pubkey_file == NULL)
+				printf("Error opening pubkey file %s :(\n", fn1);
+			if (privkey_file == NULL)
+				printf("Error opening privkey file %s :(\n", fn2);
+			int i = 0, c;
+			while ((c = fgetc(pubkey_file)) != EOF) {
+				pubkey_buffer[i] = c;
+				i++;
+			}
+			i = 0;
+			while ((c = fgetc(privkey_file)) != EOF) {
+				privkey_buffer[i] = c;
+				i++;
+			}
+			printf("\nFiles loaded into memory\n");
+			rc = libssh2_userauth_publickey_frommemory(
+				session, username, sizeof(username), pubkey_buffer,
+				sizeof(pubkey_buffer), privkey_buffer, sizeof(privkey_buffer), passphrase
+			);
 			if(rc) {
-				printf("Authentication by pubkey failed: %d", rc);
+				printf("Authentication by pubkey from memory failed: %d\nAttempting from file...\n", rc);
 			} else {
-				printf("Authentication by pubkey succeeded");
+				printf("Authentication by pubkey succeeded\n");
+			}
+			rc = libssh2_userauth_publickey_fromfile_ex(
+				session, username, sizeof(username), fn1, fn2, passphrase
+			);
+			if(rc) {
+				printf("Authentication by privkey from file failed: %d\n", rc);
+			} else {
+				printf("Authentication by pubkey succeeded\n");
 			}
  	}
 	channel = libssh2_channel_open_session(session);
@@ -259,7 +287,7 @@ int main() {
 		char buf[1024];
 		char textbuf[128];
 
-		//probably silly to store these as char arraysv
+		//probably silly to store these as char arrays
 		char enterbuf[2] = "\x0A";
 		char upbuf[5] = "\x1b[1A";
 		char downbuf[4] = "\x1b[1B";
