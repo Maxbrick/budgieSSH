@@ -20,3 +20,11 @@ Since this client is made with the 3ds-mbedtls as a crypto backend, my speculati
 to figure out how to make a key pair with mbedtls.
 
 The program searches sdmc:/3ds/ssh for key files.
+
+# Building
+
+You need devkitpro and libctru. You also need to install 3ds-mbedtls with (dkp-)pacman.
+
+Then, cross-compile libssh2 with 3ds-mbedtls as a crypto backend.
+
+Don't ask me how, I already forgot.... you could ask me to send the compiled library, however.
