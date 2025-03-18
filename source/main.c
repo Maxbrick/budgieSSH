@@ -59,7 +59,7 @@ int main() {
     //jimmy
     printf(jimmy);
 
-    printf("\nA to input text, b for backsppace, x for tab,\ny to enter\n");
+    printf("\nA to input text, b for backsppace, x for tab,\nr for carriage return (for DOS/Windows)\ny for linefeed (Enter)\n");
     printf("\nWARNING: Extremely early alpha version!!!\nBugs will happen! Also, pubkey authentication\nprobably won\'t work.\n");
     printf("\nPlease only use for local networks with password \nauthentication.\n \n");
 
