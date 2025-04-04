@@ -54,14 +54,15 @@ int main() {
     consoleInit(GFX_TOP, NULL);
     consoleDebugInit(debugDevice_CONSOLE);
 
-    printf("Welcome to \x1b[0;32mbudgieSSH!\x1b[0;37m\n");
+    printf("Welcome to \e[32mbudgieSSH!\e[37m\n");
 
     //jimmy
     printf(jimmy);
 
     printf("\nA to input text, b for backsppace, x for tab,\nr for carriage return (for DOS/Windows)\ny for linefeed (Enter)\n");
     printf("\nWARNING: Extremely early alpha version!!!\nBugs will happen! Also, pubkey authentication\nprobably won\'t work.\n");
-    printf("\nPlease only use for local networks with password \nauthentication.\n \n");
+	//testing debug functionality
+    fprintf(stderr, "\nPlease only use for local networks with password \nauthentication.\n\n");
 
     // allocate buffer for SOC service
     SOC_buffer = (u32*)memalign(SOC_ALIGN, SOC_BUFFERSIZE);
@@ -126,6 +127,8 @@ int main() {
 
     if(!session)
         printf("could not initialize SSH session x.x\n");
+	//if you want to disable libssh2 debugging, remove this line. Additionally you may compile libssh2 without debugging enabled.
+	libssh2_trace(session, ~0);
 
     rc = libssh2_session_handshake(session, sock);
     
