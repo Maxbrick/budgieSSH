@@ -14,7 +14,8 @@ After that, download the 3dsx file from the latest version in the Releases page 
 
 # Pubkey Authentication
 since this was built in mbedtls, use RSA keys. Formats like edwhateveritcalled won't work.
-I am still unsure if it works... please, try it and tell me how it goes.
+
+I am still unsure ifkey authentication works at all... please, try it and tell me how it goes.
 # Building
 
 You need devkitpro and libctru. You also need to install 3ds-mbedtls with (dkp-)pacman.
