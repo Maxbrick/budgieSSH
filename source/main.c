@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <libssh2.h>
+#include <ssh.h>
 #include <jimmy.h>
 #define SOC_ALIGN       0x1000
 #define SOC_BUFFERSIZE  0x100000
@@ -28,41 +29,28 @@ void socShutdown() {
 }
 
 int main() {
-    SwkbdState swkbd;
-    uint32_t host_addr_int;
-
-    //should probably change this to not a char array
-    char ssh_port[8];
-
-    int auth_pw = 0;
-    int rc;
-    int sock;
-    char username[60];
-    char password[60];
-    char passphrase[256];
-    char pubkey[1024];
-    char privkey[128];
-    char *userauthlist;
-    LIBSSH2_SESSION *session = NULL;
-    LIBSSH2_CHANNEL *channel;
-    char host_addr[120];
-
-
-    struct sockaddr_in sa;
-
+	//init console
     gfxInitDefault();
     consoleInit(GFX_TOP, NULL);
     consoleDebugInit(debugDevice_CONSOLE);
 
     printf("Welcome to \e[32mbudgieSSH!\e[37m\n");
-
     //jimmy
-    printf(jimmy);
+    printf("%s", jimmy);
 
     printf("\nA to input text, b for backsppace, x for tab,\nr for carriage return (for DOS/Windows)\ny for linefeed (Enter)\n");
     printf("\nWARNING: Extremely early alpha version!!!\nBugs will happen! Also, pubkey authentication\nprobably won\'t work.\n");
-	//testing debug functionality
-    fprintf(stderr, "\nPlease only use for local networks with password \nauthentication.\n\n");
+    printf("\nPlease only use for local networks with password \nauthentication.\n\n");
+
+	int rc;
+    LIBSSH2_SESSION *session = NULL;
+    LIBSSH2_CHANNEL *channel;
+
+
+    struct sockaddr_in sa;
+
+
+
 
     // allocate buffer for SOC service
     SOC_buffer = (u32*)memalign(SOC_ALIGN, SOC_BUFFERSIZE);
@@ -85,183 +73,27 @@ int main() {
             return 1;
         }
 
-    // Prompt user for target user and host address
-    // I'm not super smart with how to use keyboards
-    swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
-    swkbdSetHintText(&swkbd, "Username");
-    swkbdInputText(&swkbd, username, sizeof(username));
-    
-    swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
-    swkbdSetHintText(&swkbd, "Host Address");
-    swkbdInputText(&swkbd, host_addr, sizeof(host_addr));
-        
-    swkbdInit(&swkbd, SWKBD_TYPE_NUMPAD, 1, -1);
-    swkbdSetHintText(&swkbd, "Port Number (usually 22)");
-    swkbdInputText(&swkbd, ssh_port, sizeof(ssh_port));
-
-    printf("Username: %s\n", username);
-    printf("Host Address: %s\n", host_addr);
-
-    host_addr_int = inet_addr(host_addr);
-
     sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 
-        if (sock < 0) {
-        printf("couldn't make socket :(\n");
-        }
-
-    sa.sin_family = AF_INET;
-    sa.sin_port = htons(atoi(ssh_port));
-    sa.sin_addr.s_addr = host_addr_int;
-
-    printf("Connecting to %s:%d as user %s\n",
-        host_addr, ntohs(sa.sin_port), username);
-
-    if(connect(
-        sock,
-        (struct sockaddr*)(&sa),
-        sizeof(struct sockaddr_in)))
-        printf("connecc failed :/\n");
-
-    session = libssh2_session_init();
-
-    if(!session)
-        printf("could not initialize SSH session x.x\n");
-	//if you want to disable libssh2 debugging, remove this line. Additionally you may compile libssh2 without debugging enabled.
-	libssh2_trace(session, ~0);
-
-    rc = libssh2_session_handshake(session, sock);
+	sa = budgiessh_prompt();
+    printf("%d\n%d\n%d\n", sa.sin_family, sa.sin_port, (int)sa.sin_addr.s_addr);
     
-    libssh2_trace(session, 1);
-    if(rc) {
-        printf("faiiil: %d\n", rc);
-    } else printf("Handshook\n");
+    	
+	budgiessh_connect(session, (struct sock_addr*)&sa, sock);
+
+	//These should be loaded from a config file and then checked by
+	//the authenticate function to see if they're empty. That way
+	//you can have either inputting credentials on the fly
+	//or loading from a saved file.
+	char username[128];
+	char password[128];
+	char pubkey[256];
+	char privkey[4224];
+	char passphrase[256];
+	budgiessh_authenticate(session, username, password, pubkey, privkey, passphrase);
 
 
-    //Authentication stuff (if it wasn't obvious by now a lot of this is just copied from libssh2's examples)
-    /* check what authentication methods are available */ 
-    userauthlist = libssh2_userauth_list(session, username, (unsigned int)strlen(username));
-    if(userauthlist) {
-        printf("Authentication methods: %s\n", userauthlist);
-        if(strstr(userauthlist, "password")) {
-            auth_pw = 1;
-        } else
-        if(strstr(userauthlist, "keyboard-interactive")) {
-            auth_pw = 2;
-        } else
-        if(strstr(userauthlist, "publickey")) {
-            auth_pw = 4;
-        } 
-        char stupid_buffer_im_lazy[2];
-        swkbdInit(&swkbd, SWKBD_TYPE_NUMPAD, 1, -1);
-        swkbdSetHintText(&swkbd, "1 = password, 2 = keyboard interactive, 4 = publickey");
-        swkbdInputText(&swkbd, stupid_buffer_im_lazy, sizeof(stupid_buffer_im_lazy));
-        auth_pw = atoi(stupid_buffer_im_lazy);
-        }
-    if(auth_pw & 1) {
-        /* We could authenticate via password */ 
-        swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
-        swkbdSetHintText(&swkbd, "Password");
-        swkbdInputText(&swkbd, password, sizeof(password));
-       
-        if(libssh2_userauth_password(session, username, password)) {
-            printf("Authentication by password failed.\n");
-            goto shutdown;
-        }
-        else {
-            printf("Authentication by password succeeded.\n");
-        }
-    }/* implement this later probably her her her
-        else if(auth_pw & 2) {
-            if(libssh2_userauth_keyboard_interactive(session, username,
 
-                                                     &kbd_callback) ) {
-                printf(
-                        "Authentication by keyboard-interactive failed.\n");
-                goto shutdown;
-            }
-            else {
-                printf(
-                        "Authentication by keyboard-interactive succeeded.\n");
-            }
-        }*/
-        else if(auth_pw & 4) {
-            /* Or by public key */ 
-            
-            swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
-            swkbdSetHintText(&swkbd, "Enter name of the privkey file in sdmc:/3ds/ssh/");
-            swkbdInputText(&swkbd, privkey, sizeof(privkey));
-
-            printf("\n(Assuming that the pub key is %s.pub\n", privkey);
-
-            snprintf(pubkey, (sizeof(privkey) + 4), "%s%s", privkey, ".pub");
-
-            swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, -1);
-            swkbdSetHintText(&swkbd, "Enter Passphrase");
-            swkbdInputText(&swkbd, passphrase, sizeof(passphrase));
-            size_t fn1sz, fn2sz;
-            char *fn1, *fn2;
-
-            char const *h = "./ssh";
-            if(!h || !*h)
-                h = ".";
-            fn1sz = strlen(h) + strlen(pubkey) + 2;
-            fn2sz = strlen(h) + strlen(privkey) + 2;
-            fn1 = malloc(fn1sz);
-            fn2 = malloc(fn2sz);
-            if(!fn1 || !fn2) {
-                free(fn2);
-                free(fn1);
-                fprintf(stderr, "out of memory\n");
-                goto shutdown;
-            }
-            snprintf(fn1, fn1sz, "%s/%s", h, pubkey);
-            snprintf(fn2, fn2sz, "%s/%s", h, privkey);
-            
-            printf(pubkey);
-            printf(privkey);
-            printf("\n%s,%s\n", fn1, fn2);
-
-            //open pubkey and privkey and store them into a buffer, since I can't get the fromfile function that
-            //lssh2 provides to work...
-            printf("loading key files into memory...");
-            char pubkey_buffer[256];
-            char privkey_buffer[2048];
-            FILE *pubkey_file = fopen(fn1, "r");
-            FILE *privkey_file = fopen(fn2, "r");
-            if (pubkey_file == NULL)
-                printf("Error opening pubkey file %s :(\n", fn1);
-            if (privkey_file == NULL)
-                printf("Error opening privkey file %s :(\n", fn2);
-            int i = 0, c;
-            while ((c = fgetc(pubkey_file)) != EOF) {
-                pubkey_buffer[i] = c;
-                i++;
-            }
-            i = 0;
-            while ((c = fgetc(privkey_file)) != EOF) {
-                privkey_buffer[i] = c;
-                i++;
-            }
-            printf("\nFiles loaded into memory\n");
-            rc = libssh2_userauth_publickey_frommemory(
-                session, username, sizeof(username), pubkey_buffer,
-                sizeof(pubkey_buffer), privkey_buffer, sizeof(privkey_buffer), passphrase
-            );
-            if(rc) {
-                printf("Authentication by pubkey from memory failed: %d\nAttempting from file...\n", rc);
-            } else {
-                printf("Authentication by pubkey succeeded\n");
-            }
-            rc = libssh2_userauth_publickey_fromfile_ex(
-                session, username, sizeof(username), fn1, fn2, passphrase
-            );
-            if(rc) {
-                printf("Authentication by privkey from file failed: %d\n", rc);
-            } else {
-                printf("Authentication by pubkey succeeded\n");
-            }
-    }
     channel = libssh2_channel_open_session(session);
     printf("Openning libssh2 session...\n");
     if(!channel) {
@@ -357,6 +189,7 @@ int main() {
         }
         }
         if(kDown & KEY_START)
+			// goto shutdown;
             break;
     }
 shutdown:
