@@ -16,9 +16,9 @@ void budgiessh_prompt(struct sockaddr_in *sa) {
 	char ssh_port[8];
 	SwkbdState swkbd;
 
-    swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, sizeof(host_addr));
-    swkbdSetHintText(&swkbd, "Host Address");
-    swkbdInputText(&swkbd, host_addr, sizeof(host_addr));
+	swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, sizeof(host_addr));
+	swkbdSetHintText(&swkbd, "Host Address");
+	swkbdInputText(&swkbd, host_addr, sizeof(host_addr));
 
 	//wait till user inputs host address before continuing
 	while(host_addr[1] == NULL);
@@ -26,13 +26,13 @@ void budgiessh_prompt(struct sockaddr_in *sa) {
 	printf("Host Address:%s\n", host_addr);
 
 	SwkbdState swkbd2;
-    swkbdInit(&swkbd2, SWKBD_TYPE_NUMPAD, 1, sizeof(ssh_port));
-    swkbdSetHintText(&swkbd, "Port Number (usually 22)");
-    swkbdInputText(&swkbd, ssh_port, sizeof(ssh_port));
+	swkbdInit(&swkbd2, SWKBD_TYPE_NUMPAD, 1, sizeof(ssh_port));
+	swkbdSetHintText(&swkbd, "Port Number (usually 22)");
+	swkbdInputText(&swkbd, ssh_port, sizeof(ssh_port));
 
 	while(ssh_port[1] == NULL);
 
-    printf("Port Number: %s\n", ssh_port);
+	printf("Port Number: %s\n", ssh_port);
 
 
 	sa->sin_family = AF_INET;
@@ -46,34 +46,34 @@ void budgiessh_prompt(struct sockaddr_in *sa) {
 void budgiessh_connect(LIBSSH2_SESSION *session, const struct sockaddr_in *sa, s32 sock) {
 
 
-    if (sock < 0) {
-    	printf("couldn't make socket :(\n");
-    }
+	if (sock < 0) {
+		printf("couldn't make socket :(\n");
+	}
 
 
 	printf("Connecting... \n");
 	printf("%d", sa->sin_addr.s_addr);
 	printf("%d", sa->sin_port);
 
-    if(connect(
-        sock,
-        (const struct sockaddr*)sa,
-        sizeof(struct sockaddr_in))) {
-        	printf("connecc failed :/\n");
+	if(connect(
+		sock,
+		(const struct sockaddr*)sa,
+		sizeof(struct sockaddr_in))) {
+			printf("connecc failed :/\n");
 		} else printf("Socket connected");
 
-    session = libssh2_session_init();
+	session = libssh2_session_init();
 
-    if(!session)
-        printf("could not initialize SSH session x.x\n");
+	if(!session)
+		printf("could not initialize SSH session x.x\n");
 
    	//if you want to disable libssh2 debugging, remove this line. Additionally you may compile libssh2 without debugging enabled.
-    // libssh2_trace(session, ~0);
+	// libssh2_trace(session, ~0);
 
-    int rc = libssh2_session_handshake(session, sock);
-    
-    libssh2_trace(session, 1);
-    if(rc) {
-        printf("faiiil: %d\n", rc);
-    } else printf("Handshook\n");
+	int rc = libssh2_session_handshake(session, sock);
+	
+	libssh2_trace(session, 1);
+	if(rc) {
+		printf("faiiil: %d\n", rc);
+	} else printf("Handshook\n");
 }
