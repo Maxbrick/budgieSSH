@@ -46,12 +46,6 @@ int main() {
     LIBSSH2_SESSION *session = NULL;
     LIBSSH2_CHANNEL *channel;
 
-
-    struct sockaddr_in sa;
-
-
-
-
     // allocate buffer for SOC service
     SOC_buffer = (u32*)memalign(SOC_ALIGN, SOC_BUFFERSIZE);
 
@@ -75,30 +69,33 @@ int main() {
 
     sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 
-	sa = budgiessh_prompt();
-    printf("%d\n%d\n%d\n", sa.sin_family, sa.sin_port, (int)sa.sin_addr.s_addr);
+    //char *host_addr = "";
+    //char *ssh_port = "";
+
+	// budgiessh_prompt(host_addr, ssh_port);
+
+    struct sockaddr_in sa;
+
+	budgiessh_prompt(&sa);
+
+	//sa.sin_family = AF_INET;
+	//sa.sin_port = htons(atoi(ssh_port));
+	//sa.sin_addr.s_addr = inet_addr(host_addr);
     
+    printf("%d\n%d\n%d\n", sa.sin_family, sa.sin_port, (int)sa.sin_addr.s_addr);
+	//printf("%s\n%s\n", host_addr, ssh_port);
+    
+	session = libssh2_session_init();
     	
-	budgiessh_connect(session, (struct sock_addr*)&sa, sock);
-
-	//These should be loaded from a config file and then checked by
-	//the authenticate function to see if they're empty. That way
-	//you can have either inputting credentials on the fly
-	//or loading from a saved file.
-	char username[128];
-	char password[128];
-	char pubkey[256];
-	char privkey[4224];
-	char passphrase[256];
-	budgiessh_authenticate(session, username, password, pubkey, privkey, passphrase);
-
-
+	budgiessh_connect(session, &sa, sock);
+	budgiessh_authenticate(session);
 
     channel = libssh2_channel_open_session(session);
     printf("Openning libssh2 session...\n");
     if(!channel) {
         printf("Unable to open a session\n");
     }
+
 
     printf("Requesting pty..\n");
     if(libssh2_channel_request_pty(channel, "vt100")) {
