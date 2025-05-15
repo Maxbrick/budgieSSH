@@ -86,7 +86,7 @@ int main() {
 	//printf("%s\n%s\n", host_addr, ssh_port);
     
 	session = libssh2_session_init();
-    	
+		
 	budgiessh_connect(session, &sa, sock);
 	budgiessh_authenticate(session);
 
