@@ -27,8 +27,13 @@ void budgiessh_authenticate(LIBSSH2_SESSION *session) {
 
 	//Authentication stuff (if it wasn't obvious by now a lot of this is just copied from libssh2's examples)
 	/* check what authentication methods are available */ 
-	char *userauthlist = libssh2_userauth_list(session, username, sizeof(username));
+	while(username[2] == NULL);
+	printf("WE GOT USERNAME\n");
 
+	char *userauthlist = libssh2_userauth_list(session, username, sizeof(username));
+	while(strlen(userauthlist) < 2);
+	printf("WE GOT AUTHLIST\n");
+	
 	if(userauthlist) {
 		printf("Authentication methods: %s\n", userauthlist);
 		if(strstr(userauthlist, "password")) {

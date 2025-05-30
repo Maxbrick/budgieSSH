@@ -80,8 +80,8 @@ int main() {
 	//sa.sin_addr.s_addr = inet_addr(host_addr);
 	
 
-   	//if you want to disable libssh2 debugging, remove this line. Additionally you may compile libssh2 without debugging enabled.
-	// libssh2_trace(session, ~0);
+   	//if you want to disable libssh2 debugging, remove this line. Additionally you may compile libssh3 without debugging enabled.
+	libssh2_trace(session, ~0);
 
 		
 	budgiessh_connect(session, &sa, sock);
