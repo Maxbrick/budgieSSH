@@ -25,10 +25,9 @@ void budgiessh_authenticate(LIBSSH2_SESSION *session) {
 	swkbdSetHintText(&swkbd, "Enter Username...");
 	swkbdInputText(&swkbd, username, sizeof(username));
 
-	while(username[1] == NULL);
 	//Authentication stuff (if it wasn't obvious by now a lot of this is just copied from libssh2's examples)
 	/* check what authentication methods are available */ 
-	char *userauthlist = libssh2_userauth_list(session, username, (unsigned int)sizeof(username));
+	char *userauthlist = libssh2_userauth_list(session, username, sizeof(username));
 
 	if(userauthlist) {
 		printf("Authentication methods: %s\n", userauthlist);
@@ -47,7 +46,8 @@ void budgiessh_authenticate(LIBSSH2_SESSION *session) {
 		swkbdInputText(&swkbd, stupid_buffer_im_lazy, sizeof(stupid_buffer_im_lazy));
 		while(stupid_buffer_im_lazy[1] == NULL);
 		auth_pw = atoi(stupid_buffer_im_lazy);
-		}
+	}
+
 	if(auth_pw & 1) {
 		/* We could authenticate via password */ 
 		swkbdInit(&swkbd, SWKBD_TYPE_NORMAL, 1, sizeof(password));
@@ -61,6 +61,7 @@ void budgiessh_authenticate(LIBSSH2_SESSION *session) {
 		else {
 			printf("Authentication by password succeeded.\n");
 		}
+		return;
 	}/* implement this later probably her her her
 		else if(auth_pw & 2) {
 			if(libssh2_userauth_keyboard_interactive(session, username,
@@ -150,4 +151,5 @@ void budgiessh_authenticate(LIBSSH2_SESSION *session) {
 				printf("Authentication by pubkey succeeded\n");
 			}
 	}
+	return;
 }

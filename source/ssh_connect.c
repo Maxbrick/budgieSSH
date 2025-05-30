@@ -21,7 +21,7 @@ void budgiessh_prompt(struct sockaddr_in *sa) {
 	swkbdInputText(&swkbd, host_addr, sizeof(host_addr));
 
 	//wait till user inputs host address before continuing
-	while(host_addr[1] == NULL);
+	//while(host_addr[1] == NULL);
 
 	printf("Host Address:%s\n", host_addr);
 
@@ -42,6 +42,7 @@ void budgiessh_prompt(struct sockaddr_in *sa) {
 	//return sa;
 	//strcpy(addr, host_addr);
 	//strcpy(port, ssh_port);
+	return;
 }
 void budgiessh_connect(LIBSSH2_SESSION *session, const struct sockaddr_in *sa, s32 sock) {
 
@@ -62,13 +63,6 @@ void budgiessh_connect(LIBSSH2_SESSION *session, const struct sockaddr_in *sa, s
 			printf("connecc failed :/\n");
 		} else printf("Socket connected");
 
-	session = libssh2_session_init();
-
-	if(!session)
-		printf("could not initialize SSH session x.x\n");
-
-   	//if you want to disable libssh2 debugging, remove this line. Additionally you may compile libssh2 without debugging enabled.
-	// libssh2_trace(session, ~0);
 
 	int rc = libssh2_session_handshake(session, sock);
 	
@@ -76,4 +70,5 @@ void budgiessh_connect(LIBSSH2_SESSION *session, const struct sockaddr_in *sa, s
 	if(rc) {
 		printf("faiiil: %d\n", rc);
 	} else printf("Handshook\n");
+	return;
 }

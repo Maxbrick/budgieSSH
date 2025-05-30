@@ -69,10 +69,7 @@ int main() {
 
 	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 
-	//char *host_addr = "";
-	//char *ssh_port = "";
-
-	// budgiessh_prompt(host_addr, ssh_port);
+	session = libssh2_session_init();
 
 	struct sockaddr_in sa;
 
@@ -82,10 +79,10 @@ int main() {
 	//sa.sin_port = htons(atoi(ssh_port));
 	//sa.sin_addr.s_addr = inet_addr(host_addr);
 	
-	printf("%d\n%d\n%d\n", sa.sin_family, sa.sin_port, (int)sa.sin_addr.s_addr);
-	//printf("%s\n%s\n", host_addr, ssh_port);
-	
-	session = libssh2_session_init();
+
+   	//if you want to disable libssh2 debugging, remove this line. Additionally you may compile libssh2 without debugging enabled.
+	// libssh2_trace(session, ~0);
+
 		
 	budgiessh_connect(session, &sa, sock);
 	budgiessh_authenticate(session);
@@ -95,8 +92,6 @@ int main() {
 	if(!channel) {
 		printf("Unable to open a session\n");
 	}
-
-
 	printf("Requesting pty..\n");
 	if(libssh2_channel_request_pty(channel, "vt100")) {
 		printf("Failed requesting pty\n");

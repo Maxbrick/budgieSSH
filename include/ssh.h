@@ -1,11 +1,4 @@
-
-// extern char *username;
-// extern char *password;
-// extern char *passphrase;
-// extern char *pubkey;
-// extern char *privkey;
-extern char *userauthlist;
-
-void budgiessh_prompt();
-void budgiessh_connect();
-void budgiessh_authenticate();
+#include <libssh2.h>
+void budgiessh_prompt(struct sockaddr_in *sa);
+void budgiessh_connect(LIBSSH2_SESSION *session, const struct sockaddr_in *sa, s32 sock);
+void budgiessh_authenticate(LIBSSH2_SESSION *session);
