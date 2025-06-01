@@ -25,12 +25,10 @@ void budgiessh_prompt(struct sockaddr_in *sa) {
 
 	printf("Host Address:%s\n", host_addr);
 
-	SwkbdState swkbd2;
-	swkbdInit(&swkbd2, SWKBD_TYPE_NUMPAD, 1, sizeof(ssh_port));
+	swkbdInit(&swkbd, SWKBD_TYPE_NUMPAD, 1, sizeof(ssh_port));
 	swkbdSetHintText(&swkbd, "Port Number (usually 22)");
 	swkbdInputText(&swkbd, ssh_port, sizeof(ssh_port));
 
-	while(ssh_port[1] == NULL);
 
 	printf("Port Number: %s\n", ssh_port);
 
@@ -38,14 +36,8 @@ void budgiessh_prompt(struct sockaddr_in *sa) {
 	sa->sin_family = AF_INET;
 	sa->sin_port = htons(atoi(ssh_port));
 	sa->sin_addr.s_addr = inet_addr(host_addr);
-
-	//return sa;
-	//strcpy(addr, host_addr);
-	//strcpy(port, ssh_port);
-	return;
 }
 void budgiessh_connect(LIBSSH2_SESSION *session, const struct sockaddr_in *sa, s32 sock) {
-
 
 	if (sock < 0) {
 		printf("couldn't make socket :(\n");
@@ -53,22 +45,20 @@ void budgiessh_connect(LIBSSH2_SESSION *session, const struct sockaddr_in *sa, s
 
 
 	printf("Connecting... \n");
-	printf("%d", sa->sin_addr.s_addr);
-	printf("%d", sa->sin_port);
 
 	if(connect(
 		sock,
 		(const struct sockaddr*)sa,
 		sizeof(struct sockaddr_in))) {
 			printf("connecc failed :/\n");
-		} else printf("Socket connected");
+		} else printf("Socket connected\n");
+
 
 
 	int rc = libssh2_session_handshake(session, sock);
 	
-	libssh2_trace(session, 1);
 	if(rc) {
 		printf("faiiil: %d\n", rc);
 	} else printf("Handshook\n");
-	return;
+	libssh2_trace(session, 1);
 }
