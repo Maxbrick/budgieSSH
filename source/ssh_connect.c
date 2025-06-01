@@ -23,7 +23,7 @@ void budgiessh_prompt(struct sockaddr_in *sa) {
 	//wait till user inputs host address before continuing
 	//while(host_addr[1] == NULL);
 
-	printf("Host Address:%s\n", host_addr);
+	printf("Host Address: %s\n", host_addr);
 
 	swkbdInit(&swkbd, SWKBD_TYPE_NUMPAD, 1, sizeof(ssh_port));
 	swkbdSetHintText(&swkbd, "Port Number (usually 22)");
@@ -60,5 +60,4 @@ void budgiessh_connect(LIBSSH2_SESSION *session, const struct sockaddr_in *sa, s
 	if(rc) {
 		printf("faiiil: %d\n", rc);
 	} else printf("Handshook\n");
-	libssh2_trace(session, 1);
 }
