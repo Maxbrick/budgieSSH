@@ -47,6 +47,12 @@ int main() {
 	LIBSSH2_SESSION *session = NULL;
 	LIBSSH2_CHANNEL *channel;
 
+	rc = libssh2_init(0);
+	if(rc) {
+		fprintf(stderr, "libssh2 initialization failed (%d)\n", rc);
+		return 1;
+	}
+
 	// allocate buffer for SOC service
 	SOC_buffer = (u32*)memalign(SOC_ALIGN, SOC_BUFFERSIZE);
 	if(SOC_buffer == NULL) {
@@ -59,22 +65,12 @@ int main() {
 	// register socShutdown to run at exit
 	// atexit functions execute in reverse order so this runs before gfxExit
 	atexit(socShutdown);
-	
-
-	rc = libssh2_init(0);
-	if(rc) {
-		fprintf(stderr, "libssh2 initialization failed (%d)\n", rc);
-		return 1;
-	}
 
 	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 	session = libssh2_session_init();
-
 	libssh2_trace(session, 1);
-   	//if you want to disable libssh2 debugging, remove this line.
-   	//Additionally, you may compile libssh2 without debugging enabled.
-	libssh2_trace(session, ~0);
-
+	// (For Debugging:)
+	// libssh2_trace(session, ~0);
 
 	budgiessh_prompt(&sa);
 	budgiessh_connect(session, &sa, sock);
