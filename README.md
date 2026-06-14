@@ -22,3 +22,6 @@ You need devkitpro and libctru. You also need to install 3ds-mbedtls with (dkp-)
 
 Then, cross-compile libssh2 with 3ds-mbedtls as a crypto backend.
 to do that, source 3dsvars.sh, then run ./configure, disabing binaries and specifying the respective prefixes.
+
+# Licensing
+budgieSSH is free software under the terms of the GNU GPLv3
