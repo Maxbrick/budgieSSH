@@ -24,4 +24,5 @@ Then, cross-compile libssh2 with 3ds-mbedtls as a crypto backend.
 to do that, source 3dsvars.sh, then run ./configure, disabing binaries and specifying the respective prefixes.
 
 # Licensing
+Copyright (C) 2025 MaxBrick
 budgieSSH is free software under the terms of the GNU GPLv3
