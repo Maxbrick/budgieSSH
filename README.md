@@ -27,3 +27,6 @@ to do that, source 3dsvars.sh, then run ./configure, disabing binaries and speci
 Copyright (C) 2025 MaxBrick
 
 budgieSSH is free software licensed under the terms of the GNU GPLv3
+
+# Other
+will probably switch to codeberg soon.
